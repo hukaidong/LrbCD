@@ -5,6 +5,8 @@ module LCD
 
 	class LCD
 		attr_reader :fd
+		attr_reader :cols
+		attr_reader :rows
 
 		def initialize(&block) 
 			if block_given?
@@ -19,13 +21,16 @@ module LCD
 			@wrap = false
 			@scroll = true
 
-			screen_clear
 			self.cursor = [0, 0]
 		end
 
 		def screen_clear
 			LcdProto.lcdClear(@fd)
+			scrline = ''
 		end
+
+		alias :clear :screen_clear
+		alias :clean :screen_clear
 
 		# cursor will be defined follow 'row / col'
 		# as tty conventions
@@ -39,7 +44,8 @@ module LCD
 		end
 
 		def puts(str)
-			str = str[0..20] unless @wrap
+			str = str.ljust(@cols)
+			str = str[0..@cols] unless @wrap
 			if @cursor[0] == 0
 				_lcd_puts str 
 				self.cursor = [1, 0]
@@ -50,6 +56,16 @@ module LCD
 				_lcd_puts str
 			end
 			@scrline = str
+		end
+
+		def nolive 
+			LcdProto.lcdCursor(@fd, 0)
+			LcdProto.lcdCursorBlink(@fd, 0)
+		end
+
+		def live 
+			LcdProto.lcdCursor(@fd, 1)
+			LcdProto.lcdCursorBlink(@fd, 1)
 		end
 
 	end
@@ -92,10 +108,10 @@ module LCD
 				raise "Configure error"
 			end
 
-			lcd.instance_exec do
+			lcd.instance_exec(@colp, @rowp) do |c,r|
 				@fd = LcdProto.lcdInit *args
-				@cols = @colp
-				@rows = @rowp
+				@cols = c
+				@rows = r
 			end
 		end
 	end

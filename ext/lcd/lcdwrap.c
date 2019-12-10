@@ -97,7 +97,7 @@ Init_lcd(void) {
 	rb_define_singleton_method(lcd, "lcdClear", _wrap_lcd_clear, 1);
 	rb_define_singleton_method(lcd, "lcdDisplay", _wrap_lcd_display, 2);
 	rb_define_singleton_method(lcd, "lcdCursor", _wrap_lcd_cursor, 2);
-	rb_define_singleton_method(lcd, "lcdCursorBilnk", _wrap_lcd_cursor_blink, 2);
+	rb_define_singleton_method(lcd, "lcdCursorBlink", _wrap_lcd_cursor_blink, 2);
 	rb_define_singleton_method(lcd, "lcdPuts", _wrap_lcd_puts, 2);
 	rb_define_singleton_method(lcd, "lcdPutchar", _wrap_lcd_putchar, 2);
 	rb_define_singleton_method(lcd, "lcdPosition", _wrap_lcd_position, 3);
