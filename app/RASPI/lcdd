@@ -1,0 +1,42 @@
+#!/usr/bin/ruby
+
+fork {
+require 'lcd'
+require 'socket'
+require 'resolv'
+require 'timeout'
+
+puts 'try to start server...'
+maddr = Resolv.getaddress ENV['SERVER']
+c = UDPSocket.new :INET
+c.connect maddr, 4208
+
+heartbeat = ->{ c.send "RASPI", 0 }
+
+drv = LCD::LCD.new do 
+	col_num 16
+	row_num 2
+	rst_pin 25
+	en_pin 24
+	data_pins [23, 22, 21, 30]
+end
+
+heartbeat[]
+
+loop do 
+	Timeout::timeout(5) do
+		msg, _ = c.recvfrom(256)
+		begin
+		drv.instance_eval(msg)
+		rescue NameError
+		drv.puts msg
+		end
+	end
+rescue Timeout::Error
+	heartbeat[]
+	retry
+rescue => e
+	puts e.message
+end
+}
+

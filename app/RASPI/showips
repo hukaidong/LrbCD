@@ -1,0 +1,18 @@
+#!/usr/bin/ruby
+
+ipdesc = `/usr/bin/landscape-sysinfo --sysinfo-plugins=Network`[%r'(\d+.){4}$']
+
+require 'lcd'
+
+drv = LCD::LCD.new do 
+	col_num 16
+	row_num 2
+	rst_pin 25
+	en_pin 24
+	data_pins [23, 22, 21, 30]
+end
+
+drv.clear
+drv.puts "IP addr(wlan0):"
+drv.puts ipdesc
+
